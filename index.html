@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Boss | Elite Crypto Terminal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        blueprintDark: '#070F1E',
+                        blueprintLight: '#EAF2F8',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        body.dark-mode {
+            background-color: #070F1E;
+            color: #E2E8F0;
+            background-image: 
+                linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        body.dark-mode .card-theme {
+            background: rgba(11, 20, 43, 0.95);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
+        }
+        body.dark-mode .nav-theme {
+            background: rgba(7, 15, 30, 0.92);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        body.light-mode {
+            background-color: #E2ECF5;
+            color: #0F172A;
+            background-image: 
+                linear-gradient(to right, rgba(14, 116, 144, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(14, 116, 144, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        body.light-mode .card-theme {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(14, 116, 144, 0.25);
+            box-shadow: 0 4px 20px rgba(14, 116, 144, 0.08);
+        }
+        body.light-mode .nav-theme {
+            background: rgba(226, 236, 245, 0.92);
+            border-bottom: 1px solid rgba(14, 116, 144, 0.2);
+        }
+        body.light-mode .text-gray-300 { color: #334155 !important; }
+        body.light-mode .text-gray-400 { color: #475569 !important; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+            display: flex;
+            width: max-content;
+            animation: ticker 40s linear infinite;
+        }
+        .animate-ticker:hover { animation-play-state: paused; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="dark-mode relative min-h-screen" id="app-body">
+
+    <!-- Top Live Ticker Header -->
+    <div class="border-b h-10 overflow-hidden relative flex items-center z-50 text-[11px] font-bold nav-theme">
+        <div class="animate-ticker flex space-x-12 whitespace-nowrap px-4 items-center">
+            <a href="#charts" onclick="loadChart('BTCUSDT', 'Bitcoin (BTC)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">BTC</span> <span id="tick-btc" class="font-bold">$...</span> <span id="tickc-btc" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('ETHUSDT', 'Ethereum (ETH)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">ETH</span> <span id="tick-eth" class="font-bold">$...</span> <span id="tickc-eth" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('BNBUSDT', 'Binance Coin (BNB)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">BNB</span> <span id="tick-bnb" class="font-bold">$...</span> <span id="tickc-bnb" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('SOLUSDT', 'Solana (SOL)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">SOL</span> <span id="tick-sol" class="font-bold">$...</span> <span id="tickc-sol" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('SUIUSDT', 'Sui (SUI)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">SUI</span> <span id="tick-sui" class="font-bold">$...</span> <span id="tickc-sui" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('PEPEUSDT', 'Pepe (PEPE)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">PEPE</span> <span id="tick-pepe" class="font-bold">$...</span> <span id="tickc-pepe" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('XRPUSDT', 'Ripple (XRP)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">XRP</span> <span id="tick-xrp" class="font-bold">$...</span> <span id="tickc-xrp" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('DOGEUSDT', 'Dogecoin (DOGE)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">DOGE</span> <span id="tick-doge" class="font-bold">$...</span> <span id="tickc-doge" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('ADAUSDT', 'Cardano (ADA)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">ADA</span> <span id="tick-ada" class="font-bold">$...</span> <span id="tickc-ada" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('AVAXUSDT', 'Avalanche (AVAX)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">AVAX</span> <span id="tick-avax" class="font-bold">$...</span> <span id="tickc-avax" class="text-emerald-400">+0.0%</span></a>
+            <a href="#charts" onclick="loadChart('LINKUSDT', 'Chainlink (LINK)')" class="flex items-center space-x-2 cursor-pointer hover:opacity-80"><span class="text-cyan-400 font-bold">LINK</span> <span id="tick-link" class="font-bold">$...</span> <span id="tickc-link" class="text-emerald-400">+0.0%</span></a>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 left-0 right-0 z-40 backdrop-blur-md nav-theme">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-400 to-cyan-400 p-0.5 flex items-center justify-center shadow-lg">
+                    <div class="w-full h-full bg-[#070F1E] rounded-[10px] flex items-center justify-center font-orbitron font-black text-emerald-400 text-sm">CB</div>
+                </div>
+                <div>
+                    <span class="font-orbitron font-black text-lg tracking-wider">CHART BOSS</span>
+                    <span class="block text-[9px] text-cyan-400 font-mono tracking-widest">ELITE TRADING TERMINAL</span>
+                </div>
+            </div>
+            
+            <div class="hidden lg:flex items-center space-x-6 font-orbitron text-xs text-gray-300">
+                <a href="#charts" class="hover:text-emerald-400 transition-colors">Terminal</a>
+                <a href="#why-us" class="hover:text-emerald-400 transition-colors">Why Us</a>
+                <a href="#scanner" class="hover:text-emerald-400 transition-colors">Signals</a>
+                <a href="#testimonials" class="hover:text-emerald-400 transition-colors">Testimonials</a>
+                <a href="#about" class="hover:text-emerald-400 transition-colors">About</a>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleTheme()" class="card-theme px-3 py-2 rounded-xl text-xs font-orbitron font-bold flex items-center space-x-2 hover:scale-105 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-sun text-amber-400"></i>
+                    <span id="theme-text" class="hidden sm:inline">Light</span>
+                </button>
+
+                <a href="https://t.me/THECHARTBOSSCALLS" target="_blank" class="bg-emerald-500 text-slate-950 font-orbitron font-extrabold px-4 py-2 rounded-xl text-xs inline-flex items-center space-x-2 shadow-lg hover:bg-emerald-400 transition-all">
+                    <i class="fa-brands fa-telegram text-base"></i>
+                    <span>Join TG</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-12 px-4 border-b border-cyan-500/20">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-4">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full card-theme text-cyan-400 text-[11px] font-orbitron">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>EARLY CA • INSIDER ALPHA • STRICT RISK MANAGEMENT</span>
+                </div>
+                <h1 class="font-orbitron font-black text-3xl sm:text-5xl leading-tight">
+                    WE FIND <span class="text-emerald-400">OPPORTUNITIES</span> YOU PROFIT EARLY.
+                </h1>
+                <p class="text-gray-300 text-xs sm:text-sm font-sans font-medium max-w-xl leading-relaxed">
+                    Engineered for traders who refuse to settle for average returns. We combine strict risk management with insider-level Solana momentum to secure low market cap contracts before public exposure.
+                </p>
+                <div class="flex flex-wrap gap-3 pt-2">
+                    <a href="https://t.me/THECHARTBOSSCALLS" target="_blank" class="bg-emerald-500 text-slate-950 font-orbitron font-extrabold px-6 py-3.5 rounded-xl inline-flex items-center space-x-2 text-xs shadow-xl hover:bg-emerald-400 transition-all">
+                        <i class="fa-brands fa-telegram text-base"></i>
+                        <span>JOIN VIP TELEGRAM</span>
+                    </a>
+                    <a href="#charts" class="card-theme font-orbitron font-bold px-5 py-3.5 rounded-xl inline-flex items-center space-x-2 text-xs hover:border-emerald-400 transition-all">
+                        <i class="fa-solid fa-chart-line text-cyan-400"></i>
+                        <span>LAUNCH TERMINAL</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5 flex justify-center">
+                <a href="https://t.me/Tariq5q" target="_blank" class="card-theme p-5 rounded-2xl w-full max-w-sm block group transition-all">
+                    <div class="flex justify-between items-center mb-3 border-b border-cyan-500/20 pb-2 font-orbitron text-[11px]">
+                        <span class="text-gray-400">DIRECT LINE</span>
+                        <span class="text-emerald-400 group-hover:underline">@Tariq5q &nearr;</span>
+                    </div>
+                    <div class="flex items-center space-x-3 mb-3">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-xl text-emerald-400 shadow-md">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-orbitron font-bold text-sm tracking-wide">TACTICAL BOSS</h3>
+                            <p class="text-[11px] text-cyan-400 font-sans font-semibold">Open Telegram DM</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl border border-cyan-500/20 text-[11px] flex justify-between items-center bg-black/10">
+                        <span class="text-gray-400">Status:</span>
+                        <span class="text-emerald-400 flex items-center space-x-1 font-sans font-semibold"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>Online & Ready</span></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5-CARD FEATURE GRID -->
+    <section id="why-us" class="py-14 px-4 max-w-7xl mx-auto border-b border-cyan-500/20">
+        <div class="text-center mb-10">
+            <h2 class="font-orbitron font-black text-2xl sm:text-4xl text-white">WHY CHOOSE <span class="text-emerald-400">CHART BOSS</span></h2>
+            <p class="text-gray-400 text-xs sm:text-sm font-sans font-medium mt-2">Engineered for serious traders looking for high-probability market alpha.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="card-theme p-5 rounded-2xl space-y-3 hover:border-emerald-400 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center text-cyan-400 text-lg mb-3">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="font-orbitron font-bold text-sm text-white mb-1">EARLY CRYPTO CALLS</h3>
+                    <p class="text-[11px] text-gray-300 font-sans font-medium leading-relaxed">
+                        High probability trades with clear entry targets and structured profit milestones.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-theme p-5 rounded-2xl space-y-3 hover:border-emerald-400 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 text-lg mb-3">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="font-orbitron font-bold text-sm text-white mb-1">TRADE EDUCATION</h3>
+                    <p class="text-[11px] text-gray-300 font-sans font-medium leading-relaxed">
+                        Step-by-step guides, technical analysis, trading psychology, and market mechanics.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-theme p-5 rounded-2xl space-y-3 hover:border-emerald-400 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-emerald-400 text-lg mb-3">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="font-orbitron font-bold text-sm text-white mb-1">RISK MANAGEMENT</h3>
+                    <p class="text-[11px] text-gray-300 font-sans font-medium leading-relaxed">
+                        Master risk management techniques to protect capital while riding low-cap multipliers.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-theme p-5 rounded-2xl space-y-3 hover:border-emerald-400 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/50 flex items-center justify-center text-purple-400 text-lg mb-3">
+                        <i class="fa-solid fa-wifi"></i>
+                    </div>
+                    <h3 class="font-orbitron font-bold text-sm text-white mb-1">LIVE MARKET UPDATES</h3>
+                    <p class="text-[11px] text-gray-300 font-sans font-medium leading-relaxed">
+                        Real-time news, insider momentum shifts, and Solana network alpha to keep you ahead.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card-theme p-5 rounded-2xl space-y-3 hover:border-emerald-400 transition-all flex flex-col justify-between">
+                <div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/50 flex items-center justify-center text-blue-400 text-lg mb-3">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3 class="font-orbitron font-bold text-sm text-white mb-1">COMMUNITY SUPPORT</h3>
+                    <p class="text-[11px] text-gray-300 font-sans font-medium leading-relaxed">
+                        Join a tight-knit brotherhood of elite operators focused on growth and financial freedom.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Multi-Pair Scanner Table -->
+    <section id="scanner" class="py-12 px-4 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="font-orbitron font-black text-lg sm:text-xl flex items-center space-x-2">
+                <i class="fa-solid fa-satellite-dish text-emerald-400"></i>
+                <span>LIVE MARKET SCANNER</span>
+            </h2>
+            <span class="text-[10px] font-sans font-semibold text-cyan-400 card-theme px-3 py-1 rounded-lg">Real-Time Prices</span>
+        </div>
+        <div class="card-theme rounded-2xl overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-cyan-500/20 text-gray-400 font-orbitron bg-black/20">
+                        <th class="p-3">Asset / Pair</th>
+                        <th class="p-3">Live Price (USD)</th>
+                        <th class="p-3">24h Change</th>
+                        <th class="p-3 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-cyan-500/20 font-sans font-medium" id="scanner-tbody">
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- INTERACTIVE DYNAMIC CHART VIEWER -->
+    <section id="charts" class="py-12 px-4 max-w-7xl mx-auto">
+        <div class="text-center mb-6">
+            <h2 class="font-orbitron font-black text-2xl sm:text-3xl">LIVE <span class="text-cyan-400" id="current-chart-title">BITCOIN (BTC) CHART</span></h2>
+            <p class="text-gray-400 text-xs font-sans font-medium mt-1">Select any token below to load its exact live chart instantly.</p>
+        </div>
+
+        <div class="card-theme p-4 rounded-2xl h-[550px] flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-3">
+                <div class="font-orbitron text-xs sm:text-sm font-bold flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-line text-emerald-400"></i>
+                    <span id="chart-badge-label">BINANCE:BTCUSDT — Live Feed</span>
+                </div>
+                <!-- Mobile horizontally scrollable token buttons -->
+                <div class="flex gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 no-scrollbar">
+                    <button onclick="loadChart('BTCUSDT', 'Bitcoin (BTC)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">BTC</button>
+                    <button onclick="loadChart('ETHUSDT', 'Ethereum (ETH)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">ETH</button>
+                    <button onclick="loadChart('BNBUSDT', 'Binance Coin (BNB)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">BNB</button>
+                    <button onclick="loadChart('SOLUSDT', 'Solana (SOL)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">SOL</button>
+                    <button onclick="loadChart('XRPUSDT', 'Ripple (XRP)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">XRP</button>
+                    <button onclick="loadChart('PEPEUSDT', 'Pepe (PEPE)')" class="px-3 py-1.5 bg-black/30 border border-cyan-500/30 rounded-lg text-xs hover:border-emerald-400 whitespace-nowrap font-bold">PEPE</button>
+                </div>
+            </div>
+            
+            <div class="w-full h-full rounded-xl overflow-hidden bg-black/40 flex-1 relative" id="chart-container">
+            </div>
+        </div>
+    </section>
+
+    <!-- LIVE STATS BANNER BAR -->
+    <section id="stats" class="py-8 px-4 card-theme border-y border-cyan-500/20 bg-black/40 my-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center font-orbitron">
+            <div class="space-y-1 border-r border-cyan-500/20 last:border-none">
+                <div class="text-2xl sm:text-3xl font-black text-emerald-400">10K+</div>
+                <div class="text-[11px] text-gray-400 font-sans font-semibold uppercase tracking-wider">Community Members</div>
+            </div>
+            <div class="space-y-1 border-r border-cyan-500/20 last:border-none">
+                <div class="text-2xl sm:text-3xl font-black text-cyan-400">85%+</div>
+                <div class="text-[11px] text-gray-400 font-sans font-semibold uppercase tracking-wider">Win Rate (Last 3 Months)</div>
+            </div>
+            <div class="space-y-1 border-r border-cyan-500/20 last:border-none">
+                <div class="text-2xl sm:text-3xl font-black text-emerald-400">5K+</div>
+                <div class="text-[11px] text-gray-400 font-sans font-semibold uppercase tracking-wider">Successful Traders</div>
+            </div>
+            <div class="space-y-1">
+                <div class="text-2xl sm:text-3xl font-black text-amber-400">3+ Years</div>
+                <div class="text-[11px] text-gray-400 font-sans font-semibold uppercase tracking-wider">Trading Experience</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SUPPORTED PLATFORMS & ECOSYSTEM PARTNERS -->
+    <section id="partners" class="py-10 px-4 mb-12 max-w-7xl mx-auto">
+        <div class="text-center mb-6">
+            <p class="text-[10px] font-orbitron text-cyan-400 uppercase tracking-widest">SUPPORTED PLATFORMS & ECOSYSTEM PARTNERS</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-amber-400 transition-all">
+                <svg class="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 24 24"><path d="M12 0L5.333 6.667L8.667 10L12 6.667L15.333 10L18.667 6.667L12 0ZM5.333 17.333L12 24L18.667 17.333L15.333 14L12 17.333L8.667 14L5.333 17.333ZM2.667 12L6 15.333L9.333 12L6 8.667L2.667 12ZM14.667 12L18 15.333L21.333 12L18 8.667L14.667 12Z"/></svg>
+                <span>BINANCE</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-blue-400 transition-all">
+                <svg class="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm4.5 12.87h-2.14V9.65h-1.6v5.22H10.6V9.65H9v5.22H6.87V7.5H9.6v1.18c.63-.8 1.63-1.28 2.7-1.28 2.2 0 4 1.8 4 4v3.47z"/></svg>
+                <span>CoinMarketCap</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-400 transition-all">
+                <svg class="w-5 h-5 text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M4 4h4v5.5L13.5 4H18l-6 7.5L18 20h-4.5L8 14.5V20H4V4z"/></svg>
+                <span>KUCOIN</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-cyan-400 transition-all">
+                <svg class="w-5 h-5 text-indigo-400 fill-current" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 3.2L18.8 8 12 11.2 5.2 8 12 5.2zM5 15.6l6 3.3v-6.6L5 9v6.6zm8 3.3l6-3.3V9l-6 3.3v6.6z"/></svg>
+                <span>RAYDIUM</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-500 transition-all">
+                <svg class="w-5 h-5 text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M6 3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3zm0 2a1 1 0 00-1 1v5h14V6a1 1 0 00-1-1H6zm14 8H4v5a1 1 0 001 1h12a1 1 0 001-1v-5z"/></svg>
+                <span>PUMP.FUN</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-purple-400 transition-all">
+                <svg class="w-5 h-5 text-purple-400 fill-current" viewBox="0 0 24 24"><path d="M12 2c-5.5 0-10 4.5-10 10 0 3.5 1.8 6.6 4.5 8.4V22l2.3-1.3c1 .3 2.1.4 3.2.4 5.5 0 10-4.5 10-10S17.5 2 12 2zm-3.5 13c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/></svg>
+                <span>PHANTOM</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-400 transition-all">
+                <svg class="w-5 h-5 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm3.5 14.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"/></svg>
+                <span>ROBINHOOD</span>
+            </div>
+            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-cyan-400 transition-all">
+                <svg class="w-5 h-5 text-cyan-400 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 3.5l6.5 3.25L12 12 5.5 8.75 12 5.5zM4 10.5l7 3.5v5.25l-7-3.5V10.5zm9 8.75v-5.25l7-3.5v5.25l-7 3.5z"/></svg>
+                <span>DEXTOOLS</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMUNITY REVIEWS SECTION -->
+    <section id="testimonials" class="py-14 px-4 max-w-5xl mx-auto border-t border-cyan-500/25">
+        <div class="text-center mb-8">
+            <h2 class="font-orbitron font-black text-2xl sm:text-3xl">WHAT OUR MEMBERS SAY</h2>
+            <p class="text-xs text-gray-400 font-sans font-medium mt-1">Verified feedback from active signal subscribers and community operators.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 max-w-4xl mx-auto" id="reviews-container">
+            <div class="card-theme p-4 rounded-xl space-y-2 relative">
+                <div class="flex text-amber-400 text-xs">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-xs text-gray-200 font-sans font-medium leading-relaxed">
+                    CHART BOSS changed the way I trade. The calls are accurate, the education is top notch, and the community is incredible.
+                </p>
+                <div class="pt-2 border-t border-cyan-500/20 flex justify-between items-center text-[10px]">
+                    <span class="text-emerald-400 font-orbitron font-bold">— Marcus T. (VIP Member)</span>
+                    <span class="text-gray-400 font-sans font-semibold">Verified Trade</span>
+                </div>
+            </div>
+
+            <div class="card-theme p-4 rounded-xl space-y-2 relative">
+                <div class="flex text-amber-400 text-xs">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-xs text-gray-200 font-sans font-medium leading-relaxed">
+                    The low-cap Solana calls and insider updates give an unfair advantage. Made back my membership fee within the first 48 hours.
+                </p>
+                <div class="pt-2 border-t border-cyan-500/20 flex justify-between items-center text-[10px]">
+                    <span class="text-emerald-400 font-orbitron font-bold">— David K. (Pro Trader)</span>
+                    <span class="text-gray-400 font-sans font-semibold">Verified Trade</span>
+                </div>
+            </div>
+
+            <div class="card-theme p-4 rounded-xl space-y-2 relative">
+                <div class="flex text-amber-400 text-xs">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-xs text-gray-200 font-sans font-medium leading-relaxed">
+                    Risk management focus here is unmatched. Most channels just ape blindly, but Chart Boss teaches you how to lock in profits safely.
+                </p>
+                <div class="pt-2 border-t border-cyan-500/20 flex justify-between items-center text-[10px]">
+                    <span class="text-emerald-400 font-orbitron font-bold">— Sarah L. (Full-time Trader)</span>
+                    <span class="text-gray-400 font-sans font-semibold">Verified Trade</span>
+                </div>
+            </div>
+
+            <div class="card-theme p-4 rounded-xl space-y-2 relative">
+                <div class="flex text-amber-400 text-xs">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p class="text-xs text-gray-200 font-sans font-medium leading-relaxed">
+                    Direct admin support is lightning fast. Anytime I need clarity on a setup, @Tariq5q is right there to break down support and resistance.
+                </p>
+                <div class="pt-2 border-t border-cyan-500/20 flex justify-between items-center text-[10px]">
+                    <span class="text-emerald-400 font-orbitron font-bold">— Alex R. (Crypto Operator)</span>
+                    <span class="text-gray-400 font-sans font-semibold">Verified Trade</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Box -->
+        <div class="card-theme p-5 rounded-xl max-w-md mx-auto mb-8">
+            <h3 class="font-orbitron font-bold text-xs mb-3 text-white">Leave Your Feedback</h3>
+            <form id="review-form" onsubmit="submitReview(event)" class="space-y-3 font-sans">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[9px] text-gray-400 font-sans font-semibold mb-1">YOUR NAME / HANDLE</label>
+                        <input type="text" id="review-name" required placeholder="e.g. CryptoTrader" class="w-full bg-black/20 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-400 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] text-gray-400 font-sans font-semibold mb-1">RATING</label>
+                        <select id="review-stars" class="w-full bg-black/20 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-400 text-white">
+                            <option value="5" class="bg-slate-900">★★★★★ (5/5)</option>
+                            <option value="4" class="bg-slate-900">★★★★☆ (4/5)</option>
+                            <option value="3" class="bg-slate-900">★★★☆☆ (3/5)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[9px] text-gray-400 font-sans font-semibold mb-1">YOUR REVIEW</label>
+                    <textarea id="review-text" required rows="2" placeholder="Share your experience..." class="w-full bg-black/20 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-400 text-white"></textarea>
+                </div>
+                <button type="submit" class="bg-emerald-500 text-slate-950 font-orbitron font-bold px-5 py-2 rounded-lg text-xs hover:bg-emerald-400 transition-all shadow-md">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+
+        <!-- TRUSTPILOT TRUST BANNER -->
+        <div class="card-theme py-4 px-4 rounded-xl max-w-md mx-auto flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4 text-xs font-sans font-medium border border-cyan-500/30">
+            <div class="flex items-center space-x-1.5">
+                <span class="font-orbitron font-bold text-white tracking-wider text-xs"><i class="fa-solid fa-star text-emerald-400"></i> Trustpilot</span>
+            </div>
+            <div class="flex text-emerald-400 space-x-1">
+                <i class="fa-solid fa-star bg-emerald-500 text-slate-950 p-0.5 rounded text-[10px]"></i>
+                <i class="fa-solid fa-star bg-emerald-500 text-slate-950 p-0.5 rounded text-[10px]"></i>
+                <i class="fa-solid fa-star bg-emerald-500 text-slate-950 p-0.5 rounded text-[10px]"></i>
+                <i class="fa-solid fa-star bg-emerald-500 text-slate-950 p-0.5 rounded text-[10px]"></i>
+                <i class="fa-solid fa-star bg-emerald-500 text-slate-950 p-0.5 rounded text-[10px]"></i>
+            </div>
+            <div class="text-gray-300 text-center sm:text-left text-[11px]">
+                <strong class="text-white font-bold">4.8/5</strong> • <span class="text-emerald-400 font-bold">Excellent</span> (<span class="text-cyan-400 font-bold">1,248+ reviews</span>)
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12 px-4 max-w-5xl mx-auto border-t border-cyan-500/20 text-center font-sans font-medium text-xs text-gray-400 space-y-4">
+        <h2 class="font-orbitron font-black text-xl text-white">ABOUT CHART BOSS</h2>
+        <p class="max-w-2xl mx-auto leading-relaxed">
+            Chart Boss is an elite decentralized market intelligence platform. We specialize in identifying low market cap tokens, leveraging insider momentum, and enforcing disciplined risk management for high-performance traders worldwide.
+        </p>
+    </section>
+
+    <!-- Professional Footer -->
+    <footer class="border-t border-cyan-500/20 py-8 px-4 text-center text-xs font-sans font-medium nav-theme">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-orbitron font-bold text-sm tracking-wider">CHART BOSS TERMINAL</span>
+            </div>
+            <p class="text-gray-400">© 2026 Chart Boss. All Rights Reserved. Decentralized Market Signals.</p>
+            <div class="flex space-x-4 font-orbitron">
+                <a href="https://t.me/THECHARTBOSSCALLS" target="_blank" class="text-cyan-400 hover:underline"><i class="fa-brands fa-telegram text-base"></i> Telegram</a>
+                <a href="https://t.me/Tariq5q" target="_blank" class="text-cyan-400 hover:underline"><i class="fa-solid fa-user-secret text-base"></i> Admin DM</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        const tokens = [
+            { id: 'bitcoin', symbol: 'BTC', pair: 'BTCUSDT', name: 'Bitcoin' },
+            { id: 'ethereum', symbol: 'ETH', pair: 'ETHUSDT', name: 'Ethereum' },
+            { id: 'binancecoin', symbol: 'BNB', pair: 'BNBUSDT', name: 'Binance Coin' },
+            { id: 'solana', symbol: 'SOL', pair: 'SOLUSDT', name: 'Solana' },
+            { id: 'sui', symbol: 'SUI', pair: 'SUIUSDT', name: 'Sui' },
+            { id: 'pepe', symbol: 'PEPE', pair: 'PEPEUSDT', name: 'Pepe' },
+            { id: 'ripple', symbol: 'XRP', pair: 'XRPUSDT', name: 'Ripple' },
+            { id: 'dogecoin', symbol: 'DOGE', pair: 'DOGEUSDT', name: 'Dogecoin' },
+            { id: 'cardano', symbol: 'ADA', pair: 'ADAUSDT', name: 'Cardano' },
+            { id: 'avalanche-2', symbol: 'AVAX', pair: 'AVAXUSDT', name: 'Avalanche' },
+            { id: 'chainlink', symbol: 'LINK', pair: 'LINKUSDT', name: 'Chainlink' }
+        ];
+
+        window.addEventListener('load', () => {
+            const tbody = document.getElementById('scanner-tbody');
+            tbody.innerHTML = tokens.map(t => `
+                <tr class="hover:bg-cyan-500/10 transition-colors">
+                    <td class="p-3"><span class="font-bold">${t.symbol}/USD</span><span class="block text-[9px] text-gray-400 font-medium">${t.name}</span></td>
+                    <td id="price-${t.symbol}" class="p-3 font-bold">$...</td>
+                    <td id="change-${t.symbol}" class="p-3 text-emerald-400 font-semibold">+0.0%</td>
+                    <td class="p-3 text-right">
+                        <a href="#charts" onclick="loadChart('${t.pair}', '${t.name} (${t.symbol})')" class="bg-cyan-500/10 text-cyan-400 px-3 py-1.5 rounded-lg border border-cyan-500/30 hover:bg-emerald-500 hover:text-slate-950 transition-all font-bold inline-block font-orbitron text-[10px]">
+                            View ${t.symbol} Chart &rarr;
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+
+            fetchPrices();
+            setInterval(fetchPrices, 30000);
+            loadChart('BTCUSDT', 'Bitcoin (BTC)');
+        });
+
+        function loadChart(pairSymbol, displayName) {
+            document.getElementById('current-chart-title').innerText = `${displayName} CHART`;
+            document.getElementById('chart-badge-label').innerText = `BINANCE:${pairSymbol} — Live Candlestick Feed`;
+            
+            const container = document.getElementById('chart-container');
+            container.innerHTML = `
+                <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3A${pairSymbol}&interval=60&hidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=Etc%2FUTC" width="100%" height="100%" frameborder="0" allowtransparency="true" scrolling="no" style="width:100%;height:100%;"></iframe>
+            `;
+        }
+
+        function toggleTheme() {
+            const body = document.getElementById('app-body');
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                icon.className = 'fa-solid fa-moon text-indigo-600';
+                text.innerText = 'Dark';
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                icon.className = 'fa-solid fa-sun text-amber-400';
+                text.innerText = 'Light';
+            }
+        }
+
+        async function fetchPrices() {
+            try {
+                const ids = tokens.map(t => t.id).join(',');
+                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+                const data = await res.json();
+                tokens.forEach(t => {
+                    if(data[t.id]) {
+                        const p = data[t.id].usd;
+                        const c = data[t.id].usd_24h_change || 0;
+                        const formattedPrice = '$' + p.toLocaleString(undefined, {minimumFractionDigits: p < 1 ? 6 : 2, maximumFractionDigits: p < 1 ? 6 : 2});
+                        document.getElementById(`price-${t.symbol}`).innerText = formattedPrice;
+                        
+                        const tickEl = document.getElementById(`tick-${t.symbol.toLowerCase()}`);
+                        if(tickEl) tickEl.innerText = formattedPrice;
+
+                        const cEl = document.getElementById(`change-${t.symbol}`);
+                        const cText = (c >= 0 ? '+' : '') + c.toFixed(1) + '%';
+                        cEl.innerText = cText;
+                        cEl.style.color = c >= 0 ? '#34D399' : '#F87171';
+
+                        const tickC = document.getElementById(`tickc-${t.symbol.toLowerCase()}`);
+                        if(tickC) {
+                            tickC.innerText = cText;
+                            tickC.style.color = c >= 0 ? '#34D399' : '#F87171';
+                        }
+                    }
+                });
+            } catch(e) {}
+        }
+
+        function submitReview(event) {
+            event.preventDefault();
+            const name = document.getElementById('review-name').value;
+            const starsCount = parseInt(document.getElementById('review-stars').value);
+            const text = document.getElementById('review-text').value;
+            let starsHTML = '<i class="fa-solid fa-star"></i>'.repeat(starsCount);
+
+            const container = document.getElementById('reviews-container');
+            const newCard = document.createElement('div');
+            newCard.className = 'card-theme p-4 rounded-xl space-y-2 relative';
+            newCard.innerHTML = `
+                <div class="flex text-amber-400 text-xs">${starsHTML}</div>
+                <p class="text-xs text-gray-200 font-sans font-medium leading-relaxed">${text}</p>
+                <div class="pt-2 border-t border-cyan-500/20 flex justify-between items-center text-[10px]">
+                    <span class="text-emerald-400 font-orbitron font-bold">— ${name}</span>
+                    <span class="text-gray-400 font-sans font-semibold">Verified Member</span>
+                </div>
+            `;
+            container.prepend(newCard);
+
+            document.getElementById('review-form').reset();
+            alert('Thank you! Your review has been added to the terminal successfully.');
+        }
+    </script>
+</body>
+</html>
