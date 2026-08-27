@@ -1,0 +1,28 @@
+{
+  "name": "chartboss",
+  "version": "1.0.0",
+  "description": "Elite Crypto Trading Terminal",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darkpassenger022/chartboss.git"
+  },
+  "keywords": [
+    "crypto",
+    "trading",
+    "charts",
+    "terminal"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/darkpassenger022/chartboss/issues"
+  },
+  "homepage": "https://github.com/darkpassenger022/chartboss#readme",
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
