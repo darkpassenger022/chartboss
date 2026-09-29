@@ -261,7 +261,7 @@
                 <i class="fa-solid fa-satellite-dish text-emerald-400"></i>
                 <span>LIVE MARKET SCANNER</span>
             </h2>
-            <span class="text-[10px] font-mono text-cyan-400 card-theme px-3 py-1 rounded-lg">Real-Time Prices</span>
+            <span id="price-status" class="text-[10px] font-mono text-cyan-400 card-theme px-3 py-1 rounded-lg" role="status" aria-live="polite" aria-atomic="true">CONNECTING TO PRICE FEED…</span>
         </div>
         <div class="card-theme rounded-2xl overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
@@ -574,34 +574,107 @@
             }
         }
 
+        let pricesRequestPending = false;
+        let lastPriceUpdate = null;
+
+        function formatMarketPrice(value) {
+            const price = Number(value);
+            const fractionDigits = price < 1 ? 10 : 2;
+            return '$' + price.toLocaleString(undefined, {
+                minimumFractionDigits: price < 1 ? 6 : 2,
+                maximumFractionDigits: fractionDigits
+            });
+        }
+
+        function updatePriceStatus(message, state) {
+            const status = document.getElementById('price-status');
+            if (!status) return;
+            status.textContent = message;
+            status.dataset.state = state;
+            status.style.color = state === 'live' ? '#34D399' : state === 'stale' ? '#FBBF24' : state === 'error' ? '#F87171' : '#22D3EE';
+        }
+
+        function formatUpdateTime(date) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function markPricesUnavailable() {
+            tokens.forEach(t => {
+                const price = document.getElementById('price-' + t.symbol);
+                const change = document.getElementById('change-' + t.symbol);
+                const tickerPrice = document.getElementById('tick-' + t.symbol.toLowerCase());
+                const tickerChange = document.getElementById('tickc-' + t.symbol.toLowerCase());
+                if (price) price.textContent = 'Unavailable';
+                if (change) change.textContent = '—';
+                if (tickerPrice) tickerPrice.textContent = 'Unavailable';
+                if (tickerChange) tickerChange.textContent = '—';
+            });
+        }
+
         async function fetchPrices() {
+            if (pricesRequestPending) return;
+            pricesRequestPending = true;
+            updatePriceStatus(lastPriceUpdate ? 'REFRESHING MARKET DATA…' : 'CONNECTING TO PRICE FEED…', 'loading');
+
+            const controller = new AbortController();
+            const timeout = window.setTimeout(() => controller.abort(), 10000);
             try {
-                const ids = tokens.map(t => t.id).join(',');
-                const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
-                const data = await res.json();
-                tokens.forEach(t => {
-                    if(data[t.id]) {
-                        const p = data[t.id].usd;
-                        const c = data[t.id].usd_24h_change || 0;
-                        const formattedPrice = '$' + p.toLocaleString(undefined, {minimumFractionDigits: p < 1 ? 6 : 2, maximumFractionDigits: p < 1 ? 6 : 2});
-                        document.getElementById(`price-${t.symbol}`).innerText = formattedPrice;
-                        
-                        const tickEl = document.getElementById(`tick-${t.symbol.toLowerCase()}`);
-                        if(tickEl) tickEl.innerText = formattedPrice;
+                const response = await fetch('/api/prices', {
+                    headers: { Accept: 'application/json' },
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                if (!response.ok) throw new Error('Price API returned HTTP ' + response.status);
 
-                        const cEl = document.getElementById(`change-${t.symbol}`);
-                        const cText = (c >= 0 ? '+' : '') + c.toFixed(1) + '%';
-                        cEl.innerText = cText;
-                        cEl.style.color = c >= 0 ? '#34D399' : '#F87171';
+                const result = await response.json();
+                if (!result.prices || typeof result.prices !== 'object') {
+                    throw new Error('Price API returned an invalid response');
+                }
 
-                        const tickC = document.getElementById(`tickc-${t.symbol.toLowerCase()}`);
-                        if(tickC) {
-                            tickC.innerText = cText;
-                            tickC.style.color = c >= 0 ? '#34D399' : '#F87171';
-                        }
+                const quotes = tokens.map(t => {
+                    const quote = result.prices[t.symbol];
+                    const price = Number(quote && quote.price);
+                    const change = Number(quote && quote.change24h);
+                    if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(change)) {
+                        throw new Error('Missing or invalid quote for ' + t.symbol);
+                    }
+                    return { token: t, price, change };
+                });
+
+                quotes.forEach(({ token, price, change }) => {
+                    const formattedPrice = formatMarketPrice(price);
+                    const formattedChange = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+                    const priceElement = document.getElementById('price-' + token.symbol);
+                    const changeElement = document.getElementById('change-' + token.symbol);
+                    const tickerPrice = document.getElementById('tick-' + token.symbol.toLowerCase());
+                    const tickerChange = document.getElementById('tickc-' + token.symbol.toLowerCase());
+
+                    if (priceElement) priceElement.textContent = formattedPrice;
+                    if (changeElement) {
+                        changeElement.textContent = formattedChange;
+                        changeElement.style.color = change >= 0 ? '#34D399' : '#F87171';
+                    }
+                    if (tickerPrice) tickerPrice.textContent = formattedPrice;
+                    if (tickerChange) {
+                        tickerChange.textContent = formattedChange;
+                        tickerChange.style.color = change >= 0 ? '#34D399' : '#F87171';
                     }
                 });
-            } catch(e) {}
+
+                lastPriceUpdate = new Date();
+                updatePriceStatus('LIVE · COINPAPRIKA · ' + formatUpdateTime(lastPriceUpdate), 'live');
+            } catch (error) {
+                console.error('Unable to refresh Chart Boss market prices:', error);
+                if (lastPriceUpdate) {
+                    updatePriceStatus('STALE · LAST UPDATE ' + formatUpdateTime(lastPriceUpdate) + ' · RETRYING', 'stale');
+                } else {
+                    markPricesUnavailable();
+                    updatePriceStatus('PRICE FEED UNAVAILABLE · RETRYING', 'error');
+                }
+            } finally {
+                window.clearTimeout(timeout);
+                pricesRequestPending = false;
+            }
         }
 
         function submitReview(event) {
