@@ -22,50 +22,22 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Geist', sans-serif;
             overflow-x: hidden;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        body.dark-mode {
-            background-color: #070F1E;
-            color: #E2E8F0;
-            background-image: 
-                linear-gradient(to right, rgba(0, 229, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        body.dark-mode .card-theme {
-            background: rgba(11, 20, 43, 0.95);
-            border: 1px solid rgba(0, 229, 255, 0.25);
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.08);
-        }
-        body.dark-mode .nav-theme {
-            background: rgba(7, 15, 30, 0.92);
-            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
-        }
-        body.light-mode {
-            background-color: #E2ECF5;
-            color: #0F172A;
-            background-image: 
-                linear-gradient(to right, rgba(14, 116, 144, 0.1) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(14, 116, 144, 0.1) 1px, transparent 1px);
-            background-size: 30px 30px;
-        }
-        body.light-mode .card-theme {
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(14, 116, 144, 0.25);
-            box-shadow: 0 4px 20px rgba(14, 116, 144, 0.08);
-        }
-        body.light-mode .nav-theme {
-            background: rgba(226, 236, 245, 0.92);
-            border-bottom: 1px solid rgba(14, 116, 144, 0.2);
-        }
+        body.dark-mode { background-color: #070F1E; color: #E2E8F0; background-image: linear-gradient(to right, rgba(0,229,255,0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,229,255,0.025) 1px, transparent 1px); background-size: 42px 42px; }
+        body.dark-mode .card-theme { background: rgba(13,21,38,0.88); border: 1px solid rgba(148,163,184,0.14); box-shadow: 0 16px 36px rgba(0,0,0,0.20); }
+        body.dark-mode .nav-theme { background: rgba(7,15,30,0.90); border-bottom: 1px solid rgba(148,163,184,0.12); }
+        body.light-mode { background-color: #F4F7FB; color: #0F172A; background-image: linear-gradient(to right, rgba(14,116,144,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(14,116,144,0.05) 1px, transparent 1px); background-size: 42px 42px; }
+        body.light-mode .card-theme { background: rgba(255,255,255,0.92); border: 1px solid rgba(15,23,42,0.08); box-shadow: 0 16px 36px rgba(15,23,42,0.06); }
+        body.light-mode .nav-theme { background: rgba(255,255,255,0.90); border-bottom: 1px solid rgba(15,23,42,0.08); }
         body.light-mode .text-gray-300 { color: #334155 !important; }
         body.light-mode .text-gray-400 { color: #475569 !important; }
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-orbitron { font-family: 'Geist', sans-serif; } .partner-card { background: rgba(255,255,255,0.025) !important; border-color: rgba(148,163,184,0.16) !important; box-shadow: none !important; } body.light-mode .partner-card { background: rgba(255,255,255,0.78) !important; border-color: rgba(15,23,42,0.10) !important; } .partner-name { color: #cbd5e1; } body.light-mode .partner-name { color: #334155; } .partner-logo { transition: transform 180ms ease; } .partner-card:hover .partner-logo { transform: scale(1.06); } .font-mono { font-family: 'Geist Mono', monospace !important; font-variant-numeric: tabular-nums; } p.font-mono { font-family: 'Geist', sans-serif !important; } #about.font-mono, footer.font-mono { font-family: 'Geist', sans-serif !important; } h1.font-orbitron, h2.font-orbitron { letter-spacing: -0.04em; }
         @keyframes ticker {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -330,54 +302,7 @@
         </div>
     </section>
 
-    <!-- SUPPORTED PLATFORMS & ECOSYSTEM PARTNERS (With Exact Reference SVGs) -->
-    <section id="partners" class="py-10 px-4 mb-12 max-w-7xl mx-auto">
-        <div class="text-center mb-6">
-            <p class="text-[10px] font-orbitron text-cyan-400 uppercase tracking-widest">SUPPORTED PLATFORMS & ECOSYSTEM PARTNERS</p>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-            <!-- Binance -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-amber-400 transition-all">
-                <svg class="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 24 24"><path d="M12 0L5.333 6.667L8.667 10L12 6.667L15.333 10L18.667 6.667L12 0ZM5.333 17.333L12 24L18.667 17.333L15.333 14L12 17.333L8.667 14L5.333 17.333ZM2.667 12L6 15.333L9.333 12L6 8.667L2.667 12ZM14.667 12L18 15.333L21.333 12L18 8.667L14.667 12Z"/></svg>
-                <span>BINANCE</span>
-            </div>
-            <!-- CoinMarketCap -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-blue-400 transition-all">
-                <svg class="w-5 h-5 text-blue-500 fill-current" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm4.5 12.87h-2.14V9.65h-1.6v5.22H10.6V9.65H9v5.22H6.87V7.5H9.6v1.18c.63-.8 1.63-1.28 2.7-1.28 2.2 0 4 1.8 4 4v3.47z"/></svg>
-                <span>CoinMarketCap</span>
-            </div>
-            <!-- KuCoin -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-400 transition-all">
-                <svg class="w-5 h-5 text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M4 4h4v5.5L13.5 4H18l-6 7.5L18 20h-4.5L8 14.5V20H4V4z"/></svg>
-                <span>KUCOIN</span>
-            </div>
-            <!-- Raydium -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-cyan-400 transition-all">
-                <svg class="w-5 h-5 text-indigo-400 fill-current" viewBox="0 0 24 24"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 3.2L18.8 8 12 11.2 5.2 8 12 5.2zM5 15.6l6 3.3v-6.6L5 9v6.6zm8 3.3l6-3.3V9l-6 3.3v6.6z"/></svg>
-                <span>RAYDIUM</span>
-            </div>
-            <!-- Pump.fun -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-500 transition-all">
-                <svg class="w-5 h-5 text-emerald-400 fill-current" viewBox="0 0 24 24"><path d="M6 3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6a3 3 0 013-3zm0 2a1 1 0 00-1 1v5h14V6a1 1 0 00-1-1H6zm14 8H4v5a1 1 0 001 1h12a1 1 0 001-1v-5z"/></svg>
-                <span>PUMP.FUN</span>
-            </div>
-            <!-- Phantom -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-purple-400 transition-all">
-                <svg class="w-5 h-5 text-purple-400 fill-current" viewBox="0 0 24 24"><path d="M12 2c-5.5 0-10 4.5-10 10 0 3.5 1.8 6.6 4.5 8.4V22l2.3-1.3c1 .3 2.1.4 3.2.4 5.5 0 10-4.5 10-10S17.5 2 12 2zm-3.5 13c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/></svg>
-                <span>PHANTOM</span>
-            </div>
-            <!-- Robinhood -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-emerald-400 transition-all">
-                <svg class="w-5 h-5 text-emerald-500 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm3.5 14.5c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5 4.5 2 4.5 4.5-2 4.5-4.5 4.5z"/></svg>
-                <span>ROBINHOOD</span>
-            </div>
-            <!-- DEXTools -->
-            <div class="card-theme py-3 px-3 rounded-xl flex items-center justify-center space-x-2 font-bold font-orbitron text-xs hover:border-cyan-400 transition-all">
-                <svg class="w-5 h-5 text-cyan-400 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 3.5l6.5 3.25L12 12 5.5 8.75 12 5.5zM4 10.5l7 3.5v5.25l-7-3.5V10.5zm9 8.75v-5.25l7-3.5v5.25l-7 3.5z"/></svg>
-                <span>DEXTOOLS</span>
-            </div>
-        </div>
-    </section>
+    <!-- PLATFORMS & ECOSYSTEMS WE TRACK --> <section id="partners" class="py-12 px-4 mb-12 max-w-7xl mx-auto"> <div class="text-center mb-7"><p class="text-[10px] font-mono text-gray-400 uppercase tracking-[0.22em]">Platforms &amp; ecosystems</p></div> <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4"><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=binance.com&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">BINANCE</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=coinmarketcap.com&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">COINMARKETCAP</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=kucoin.com&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">KUCOIN</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=raydium.io&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">RAYDIUM</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=pump.fun&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">PUMP.FUN</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=phantom.app&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">PHANTOM</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=robinhood.com&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">ROBINHOOD</span></div><div class="partner-card card-theme rounded-2xl px-3 py-4 flex flex-col items-center justify-center gap-3 transition-all duration-200 hover:-translate-y-0.5"><img src="https://www.google.com/s2/favicons?domain=dextools.io&amp;sz=128" alt="" aria-hidden="true" width="128" height="128" loading="lazy" decoding="async" class="partner-logo h-8 w-8 rounded-lg object-contain"><span class="partner-name text-[10px] font-semibold tracking-wide text-center">DEXTOOLS</span></div></div></section>
 
     <!-- COMMUNITY REVIEWS SECTION (Reduced Card Sizing, No Quotation Marks) -->
     <section id="testimonials" class="py-14 px-4 max-w-5xl mx-auto border-t border-cyan-500/25">
